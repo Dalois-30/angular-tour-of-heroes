@@ -28,19 +28,19 @@ export class HeroService {
   * @param operation - name of the operation that failed
   * @param result - optional value to return as the oservable result
   */
-     private handleError<T>(operation = 'operation', result?: T){
-      return (error: any): Observable<T> => {
-  
-        // TODO: send the error to remote loggin infrastructure
-        console.error(error); // log to console instead
-  
-        // TODO: better job of transforing error for user consmption
-        this.log(`${operation} failed: ${error.message}`);
-  
-        // Let the app keep running by returning an empty result.
-        return of(result as T);
-      };
-    }
+  private handleError<T>(operation = 'operation', result?: T){
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remote loggin infrastructure
+      console.error(error); // log to console instead
+
+      // TODO: better job of transforing error for user consmption
+      this.log(`${operation} failed: ${error.message}`);
+
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
+  }
 
   getHeroes(): Observable<Hero[]>{
     // const heroes = of(HEROES);
@@ -70,6 +70,15 @@ export class HeroService {
       .pipe(
         tap(_ => this.log (`update hero id=${hero.id}`)),
         catchError(this.handleError<any>('updateHero'))
+      );
+  }
+
+  /** POST: add a new hero to the server */
+  addHero(hero: Hero): Observable<Hero>{
+    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions)
+      .pipe(
+        tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
+        catchError(this.handleError<Hero>('addHero'))
       );
   }
 
